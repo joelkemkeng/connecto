@@ -1,0 +1,131 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:connecto.crossplat.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="connecto.crossplat.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+
+  <Design.DataContext>
+    <vm:LoginViewModel />
+  </Design.DataContext>
+
+  <Panel>
+    <!-- Arrière-plan avec dégradé -->
+    <Panel>
+      <ExperimentalAcrylicBorder IsHitTestVisible="False">
+        <ExperimentalAcrylicBorder.Material>
+          <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            TintColor="#05103A"
+            TintOpacity="1"
+            MaterialOpacity="0.65" />
+        </ExperimentalAcrylicBorder.Material>
+      </ExperimentalAcrylicBorder>
+    </Panel>
+
+    <!-- Contenu principal -->
+    <Border Width="400" Height="500" 
+            CornerRadius="20" 
+            Background="#20FFFFFF"
+            BoxShadow="0 4 20 0 #40000000"
+            Margin="0 40 0 0">
+      <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+        <!-- En-tête -->
+        <StackPanel Grid.Row="0" Spacing="10" Margin="0 20 0 0">
+          <TextBlock Text="Connecto" 
+                    HorizontalAlignment="Center" 
+                    FontSize="32" 
+                    FontWeight="Bold" 
+                    Foreground="White"/>
+          <TextBlock Text="Se connecter à votre compte" 
+                    HorizontalAlignment="Center" 
+                    FontSize="16" 
+                    Foreground="LightGray"/>
+        </StackPanel>
+
+        <!-- Formulaire de connexion -->
+        <StackPanel Grid.Row="1" 
+                    VerticalAlignment="Center" 
+                    Spacing="20" 
+                    Margin="30 10">
+          <!-- Champ Nom d'utilisateur -->
+          <StackPanel Spacing="5">
+            <TextBlock Text="Nom d'utilisateur" 
+                      Foreground="White" 
+                      FontSize="14"/>
+            <TextBox Text="{Binding Username}" 
+                    Watermark="Entrez votre nom d'utilisateur" 
+                    CornerRadius="5"
+                    Height="45"
+                    Padding="10,0,0,0"
+                    Background="#30FFFFFF"
+                    Foreground="White"/>
+          </StackPanel>
+
+          <!-- Champ Mot de passe -->
+          <StackPanel Spacing="5">
+            <TextBlock Text="Mot de passe" 
+                      Foreground="White" 
+                      FontSize="14"/>
+            <TextBox Text="{Binding Password}" 
+                    PasswordChar="•" 
+                    Watermark="Entrez votre mot de passe" 
+                    CornerRadius="5"
+                    Height="45"
+                    Padding="10,0,0,0"
+                    Background="#30FFFFFF"
+                    Foreground="White"/>
+          </StackPanel>
+
+          <!-- Mot de passe oublié -->
+          <TextBlock Text="Mot de passe oublié?" 
+                    Foreground="#8EC5FC" 
+                    FontSize="12" 
+                    HorizontalAlignment="Right" 
+                    Cursor="Hand"/>
+
+          <!-- Message d'erreur -->
+          <TextBlock Text="{Binding ErrorMessage}" 
+                    Foreground="#FFE47F7F" 
+                    FontSize="14" 
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding !!ErrorMessage}"/>
+
+          <!-- Bouton de connexion -->
+          <Button Command="{Binding LoginCommand}" 
+                  HorizontalAlignment="Stretch" 
+                  HorizontalContentAlignment="Center" 
+                  Height="45" 
+                  Content="Se connecter"
+                  IsEnabled="{Binding !IsLoading}"
+                  Background="#8EC5FC"
+                  Foreground="White"
+                  CornerRadius="5"
+                  FontWeight="SemiBold"/>
+                  
+          <!-- Indicateur de chargement -->
+          <ProgressBar IsIndeterminate="True" 
+                      IsVisible="{Binding IsLoading}" 
+                      HorizontalAlignment="Center"
+                      Width="200" />
+        </StackPanel>
+
+        <!-- Pied de page -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
+          <TextBlock Text="Pas encore de compte?" Foreground="LightGray"/>
+          <TextBlock Text="S'inscrire" 
+                    Foreground="#8EC5FC"
+                    Cursor="Hand">
+            <TextBlock.Styles>
+              <Style Selector="TextBlock">
+                <Setter Property="TextDecorations" Value="Underline"/>
+              </Style>
+            </TextBlock.Styles>
+          </TextBlock>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Panel>
+</UserControl>

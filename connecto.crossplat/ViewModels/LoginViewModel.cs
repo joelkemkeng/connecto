@@ -6,54 +6,31 @@ using System.Threading.Tasks;
 
 
 
-using System.Threading.Tasks;
-using System.Windows.Input;
-using ReactiveUI;
-using System.Reactive;
+
+
+
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace connecto.crossplat.ViewModels
 {
-    public class LoginViewModel : ViewModelBase
+    public partial class LoginViewModel : ViewModelBase
     {
+        [ObservableProperty]
         private string _username = "";
+
+        [ObservableProperty]
         private string _password = "";
+
+        [ObservableProperty]
         private string _errorMessage = "";
+
+        [ObservableProperty]
         private bool _isLoading = false;
 
-        public string Username
-        {
-            get => _username;
-            set => this.RaiseAndSetIfChanged(ref _username, value);
-        }
-
-        public string Password
-        {
-            get => _password;
-            set => this.RaiseAndSetIfChanged(ref _password, value);
-        }
-
-        public string ErrorMessage
-        {
-            get => _errorMessage;
-            set => this.RaiseAndSetIfChanged(ref _errorMessage, value);
-        }
-
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set => this.RaiseAndSetIfChanged(ref _isLoading, value);
-        }
-
-        public ICommand LoginCommand { get; }
-        public ICommand RegisterCommand { get; }
-
-        public LoginViewModel()
-        {
-            LoginCommand = ReactiveCommand.CreateFromTask(ExecuteLoginAsync);
-            RegisterCommand = ReactiveCommand.Create(ExecuteRegister);
-        }
-
-        private async Task ExecuteLoginAsync()
+        [RelayCommand]
+        private async Task Login()
         {
             IsLoading = true;
             ErrorMessage = "";
@@ -64,8 +41,7 @@ namespace connecto.crossplat.ViewModels
             // Logique d'authentification simple pour l'exemple
             if (Username == "admin" && Password == "password")
             {
-                // Authentification réussie - Dans un cas réel, on naviguerait vers le dashboard
-                // ou on stockerait un token d'authentification
+                // Authentification réussie
                 ErrorMessage = ""; // On efface tout message d'erreur
             }
             else
@@ -76,7 +52,8 @@ namespace connecto.crossplat.ViewModels
             IsLoading = false;
         }
 
-        private void ExecuteRegister()
+        [RelayCommand]
+        private void Register()
         {
             // Dans un cas réel, on naviguerait vers la page d'inscription
             ErrorMessage = "Redirection vers la page d'inscription...";

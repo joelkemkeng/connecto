@@ -1,15 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
-
-
-
-
-
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -29,6 +19,9 @@ namespace connecto.crossplat.ViewModels
         [ObservableProperty]
         private bool _isLoading = false;
 
+        // Propriété pour la navigation
+        public event EventHandler<NavigationEventArgs>? NavigationRequested; // Rendre nullable
+
         [RelayCommand]
         private async Task Login()
         {
@@ -41,8 +34,8 @@ namespace connecto.crossplat.ViewModels
             // Logique d'authentification simple pour l'exemple
             if (Username == "admin" && Password == "password")
             {
-                // Authentification réussie
-                ErrorMessage = ""; // On efface tout message d'erreur
+                // Authentification réussie - Naviguer vers la page d'accueil
+                NavigationRequested?.Invoke(this, new NavigationEventArgs("Home"));
             }
             else
             {
@@ -57,6 +50,17 @@ namespace connecto.crossplat.ViewModels
         {
             // Dans un cas réel, on naviguerait vers la page d'inscription
             ErrorMessage = "Redirection vers la page d'inscription...";
+        }
+    }
+
+    // Classe pour les événements de navigation
+    public class NavigationEventArgs : EventArgs
+    {
+        public string ViewName { get; }
+
+        public NavigationEventArgs(string viewName)
+        {
+            ViewName = viewName ?? throw new ArgumentNullException(nameof(viewName));
         }
     }
 }

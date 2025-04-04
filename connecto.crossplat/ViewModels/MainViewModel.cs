@@ -1,16 +1,36 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace connecto.crossplat.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private string _greeting = "Welcome to Avalonia!";
-    
-    public LoginViewModel LoginVM { get; }
+    private ViewModelBase _currentView;
+
+    [ObservableProperty]
+    private LoginViewModel _loginVM;
+
+    [ObservableProperty]
+    private HomeViewModel _homeVM;
 
     public MainViewModel()
     {
-        // Initialiser le LoginViewModel
+        // Initialiser les ViewModels
         LoginVM = new LoginViewModel();
+        HomeVM = new HomeViewModel();
+
+        // Configurer la navigation
+        LoginVM.NavigationRequested += OnNavigationRequested;
+
+        // Définir la vue initiale
+        CurrentView = LoginVM;
+    }
+
+    private void OnNavigationRequested(object? sender, NavigationEventArgs e)
+    {
+        if (e.ViewName == "Home")
+        {
+            CurrentView = HomeVM;
+        }
     }
 }

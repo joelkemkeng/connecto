@@ -17,12 +17,28 @@ Avant de commencer, assurez-vous d'avoir installé :
 
 ### 1. Cloner le Projet
 
+Pour cloner la branche principale (main) :
 ```bash
 # Cloner le repository
 git clone https://github.com/joelkemkeng/connecto.git
 
 # Accéder au dossier du projet
 cd connecto
+```
+
+Pour cloner une branche spécifique (par exemple dev_confirm) :
+```bash
+# Méthode 1 : Cloner directement la branche spécifique
+git clone -b dev_confirm https://github.com/joelkemkeng/connecto.git
+cd connecto
+
+# OU Méthode 2 : Cloner puis basculer sur la branche
+git clone https://github.com/joelkemkeng/connecto.git
+cd connecto
+git checkout dev_confirm
+
+# Vérifier la branche active
+git branch
 ```
 
 ### 2. Configuration de l'Environnement

@@ -8,14 +8,8 @@ services:
     ports:
       - "8080:80"
     restart: unless-stopped
-
-  #connecto-desktop:
-  #  build:
-  #    context: .
-  #    dockerfile: Dockerfile.desktop
-    #environment:
-      #- DISPLAY=${DISPLAY}  # Nécessaire sous Linux pour l'affichage graphique
-      #- DISPLAY=host.docker.internal:0.0
-    #volumes:
-      #- /tmp/.X11-unix:/tmp/.X11-unix
-    #restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -180,7 +180,9 @@
                     Background="#40393f" 
                     Foreground="White"
                     CaretBrush="White"
-                    BorderThickness="0">
+                    BorderThickness="0"
+                    GotFocus="MessageTextBox_GotFocus"
+                    LostFocus="MessageTextBox_LostFocus">
               <TextBox.Styles>
                 <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
                   <Setter Property="Background" Value="#40393f"/>

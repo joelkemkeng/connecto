@@ -1,36 +1,64 @@
 # --- Étape de build ---
-    FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-    WORKDIR /app
-    
-    # Copier l'ensemble du code source
-    COPY . .
-    
-    # Publier l'application Web (Browser) en mode Release
-    # Note : On retire le paramètre /p:SkipRestorePackages=true pour forcer la restauration des packages sur un clone frais.
-    RUN dotnet publish connecto.crossplat.Browser/connecto.crossplat.Browser.csproj -c Release -o /app/publish
-    
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /app
 
-    
-    # Lister le contenu généré pour le debug
-    RUN ls -la /app/publish
-    
-    # --- Étape finale : Image Nginx ---
-    FROM nginx:alpine
-    WORKDIR /usr/share/nginx/html
-    
-    # Supprimer le contenu par défaut de Nginx afin de remplacer la page par défaut
-    RUN rm -rf ./*
-    
-    # Copier le contenu publié depuis l'étape de build
-    COPY --from=build /app/publish .
-    
-    # Copier le fichier de configuration Nginx
-    COPY nginx.conf /etc/nginx/nginx.conf
-    
-    EXPOSE 80
-    
-    # (Optionnel) Afficher le contenu pour déboguer
-    RUN ls -la /usr/share/nginx/html
-    
+# Installer Python et les dépendances nécessaires
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python-is-python3 \
+    && rm -rf /var/lib/apt/lists/*
 
-  
+# Installer les workloads nécessaires
+RUN dotnet workload install wasm-tools
+
+# Configurer NuGet
+RUN mkdir -p /root/.nuget/NuGet && \
+    echo '<?xml version="1.0" encoding="utf-8"?> \
+    <configuration> \
+      <packageSources> \
+        <clear /> \
+        <add key="nuget.org" value="https://api.nuget.org/v3/index.json" /> \
+      </packageSources> \
+    </configuration>' > /root/.nuget/NuGet/NuGet.Config
+
+# Copier les fichiers projet pour la restauration
+COPY *.sln .
+COPY connecto.crossplat/*.csproj ./connecto.crossplat/
+COPY connecto.crossplat.Browser/*.csproj ./connecto.crossplat.Browser/
+COPY Directory.Packages.props .
+
+# Restaurer les packages
+RUN dotnet restore connecto.crossplat.Browser/connecto.crossplat.Browser.csproj
+
+# Copier le reste du code source
+COPY . .
+
+# Build et Publish
+RUN dotnet publish connecto.crossplat.Browser/connecto.crossplat.Browser.csproj -c Release -o /app/publish
+
+# Vérifier le contenu publié (pour debug)
+RUN ls -la /app/publish
+RUN ls -la /app/publish/wwwroot || echo "Le dossier wwwroot n'existe pas!"
+
+# --- Étape finale : Image Nginx ---
+FROM nginx:alpine
+WORKDIR /usr/share/nginx/html
+
+# Supprimer le contenu par défaut de Nginx
+RUN rm -rf ./*
+
+# Copier le contenu publié depuis l'étape de build
+COPY --from=build /app/publish/wwwroot .
+
+# Copier le fichier de configuration Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Vérifier le contenu final
+RUN ls -la
+
+EXPOSE 80
+
+
+
+
+

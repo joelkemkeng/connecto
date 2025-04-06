@@ -1,209 +1,504 @@
-# Guide de déploiement pour Connecto
+# Connecto - Application de Messagerie Cross-Platform
 
-Ce document explique comment installer, configurer et déployer l'application Connecto en mode desktop et web.
+Connecto est une application de messagerie moderne développée avec Avalonia UI, fonctionnant sur Desktop, Web, Android et iOS.
 
-## Prérequis
+# 🚀 Guide de Déploiement Connecto
 
+## 📋 Prérequis
+
+Avant de commencer, assurez-vous d'avoir installé :
+
+- [Git](https://git-scm.com/downloads)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-- Visual Studio 2022, Visual Studio Code, ou JetBrains Rider
-- Git
-- Accès à un terminal/ligne de commande
+- [Visual Studio Code](https://code.visualstudio.com/) (recommandé)
 
-## Installation et configuration
+## 📥 Installation
 
-### 1. Cloner le projet
+### 1. Cloner le Projet
 
 ```bash
-git clone https://github.com/your-username/connecto.git
+# Cloner le repository
+git clone https://github.com/joelkemkeng/connecto.git
+
+# Accéder au dossier du projet
 cd connecto
 ```
 
-### 2. Installer les templates Avalonia
+### 2. Configuration de l'Environnement
 
 ```bash
+# Installer les templates Avalonia (nécessaire une seule fois)
 dotnet new install Avalonia.Templates
+
+# Installer les workloads nécessaires
+dotnet workload install wasm-tools
 ```
 
-### 3. Restaurer les dépendances
+### 3. Restauration des Dépendances
 
 ```bash
+# Restaurer les packages NuGet
 dotnet restore connecto.crossplat.sln
 ```
 
-### 4. Installer les charges de travail .NET (optionnel, pour les plateformes mobiles)
+## 🌐 Déploiement Web avec Docker
 
-Si vous souhaitez également travailler sur les versions Android ou iOS :
-
-```bash
-# Pour Android
-dotnet workload install android
-
-# Pour iOS (nécessite un Mac)
-dotnet workload install ios
-```
-
-## Structure du projet
-
-Le projet Connecto est une application cross-platform construite avec Avalonia UI :
-
-- `connecto.crossplat` - Projet principal contenant la logique de l'application
-- `connecto.crossplat.Desktop` - Configuration spécifique pour la version desktop
-- `connecto.crossplat.Browser` - Configuration spécifique pour la version web
-- `connecto.crossplat.Android` - Configuration spécifique pour Android (optionnel)
-- `connecto.crossplat.iOS` - Configuration spécifique pour iOS (optionnel)
-
-## Exécution de l'application
-
-### Version Desktop
+### 1. Construction de l'Image
 
 ```bash
-dotnet run --project connecto.crossplat.Desktop
+# Se placer dans le dossier du projet
+cd connecto/connecto/connecto.crossplat
+
+# Construire l'image Docker
+docker compose build --no-cache
 ```
 
-### Version Web
+### 2. Lancement de l'Application
 
 ```bash
-dotnet run --project connecto.crossplat.Browser
+# Démarrer l'application
+docker compose up
 ```
 
-Si le port est déjà utilisé, vous pouvez modifier le port dans `connecto.crossplat.Browser/Properties/launchSettings.json`.
+L'application sera accessible à l'adresse : http://localhost:8080
 
-## Dépendances principales
-
-| Dépendance | Version | Description |
-|------------|---------|-------------|
-| Avalonia | 11.2.6 | Framework UI cross-platform |
-| Avalonia.Desktop | 11.2.6 | Support pour applications desktop |
-| Avalonia.Browser | 11.2.6 | Support pour applications web |
-| Avalonia.Themes.Fluent | 11.2.6 | Thème Fluent pour Avalonia |
-| Avalonia.Fonts.Inter | 11.2.6 | Polices Inter pour Avalonia |
-| CommunityToolkit.Mvvm | 8.2.1 | Toolkit MVVM pour .NET |
-
-## Débogage
-
-### Visual Studio / Visual Studio Code
-
-1. Ouvrez la solution `connecto.crossplat.sln`
-2. Sélectionnez le projet de démarrage (Desktop ou Browser)
-3. Appuyez sur F5 pour démarrer le débogage
-
-### Ligne de commande
+### 3. Arrêt de l'Application
 
 ```bash
-# Pour la version desktop
-dotnet run --project connecto.crossplat.Desktop
-
-# Pour la version web
-dotnet run --project connecto.crossplat.Browser
+# Pour arrêter l'application (dans un autre terminal)
+docker compose down
 ```
 
-## Développement
+## 💻 Déploiement en Mode Desktop
 
-### Ajouter un nouveau écran
+### Prérequis pour le Mode Desktop
 
-1. Créez une nouvelle classe ViewModel dans le dossier `ViewModels`
-2. Créez une nouvelle vue XAML dans le dossier `Views`
-3. Ajoutez la navigation vers cette vue dans `MainViewModel.cs`
+1. **Système d'exploitation compatible** :
+   - Windows 10 ou plus récent
+   - macOS 10.15 (Catalina) ou plus récent
+   - Linux (Ubuntu 20.04, Fedora 35 ou distributions similaires)
 
-### Authentification
+2. **Installations requises** :
+   - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+   - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) ou [Visual Studio Code](https://code.visualstudio.com/)
+   - Si Visual Studio Code :
+     - Extension C# Dev Kit
+     - Extension Avalonia for VS Code
 
-Les identifiants de démonstration sont :
-- Nom d'utilisateur : `admin`
-- Mot de passe : `password`
+3. **Extensions et Workloads .NET** :
+   ```bash
+   # Installer les templates Avalonia
+   dotnet new install Avalonia.Templates
 
-## Déploiement Docker
+   # Vérifier l'installation du SDK .NET
+   dotnet --version
 
-Voici comment conteneuriser l'application Connecto :
+   # Vérifier les workloads installés
+   dotnet workload list
+   ```
 
-1. Créez un fichier `Dockerfile` à la racine du projet :
+### Étapes de Configuration
 
-```dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
+1. **Cloner le Projet** (si pas déjà fait) :
+   ```bash
+   git clone https://github.com/joelkemkeng/connecto.git
+   cd connecto
+   ```
 
-# Copier les fichiers de projet et restaurer les dépendances
-COPY *.sln .
-COPY connecto.crossplat/*.csproj ./connecto.crossplat/
-COPY connecto.crossplat.Browser/*.csproj ./connecto.crossplat.Browser/
-COPY connecto.crossplat.Desktop/*.csproj ./connecto.crossplat.Desktop/
-RUN dotnet restore
+2. **Restauration des Packages** :
+   ```bash
+   # Accéder au dossier du projet
+   cd connecto/connecto/connecto.crossplat
 
-# Copier tout le code source et construire
-COPY . .
-RUN dotnet build -c Release --no-restore
+   # Restaurer les dépendances
+   dotnet restore
 
-# Publier l'application
-FROM build AS publish
-RUN dotnet publish connecto.crossplat.Browser -c Release -o /app/publish --no-build
+   # Nettoyer le projet (en cas de problèmes)
+   dotnet clean
+   ```
 
-# Créer l'image finale
-FROM nginx:alpine AS final
-WORKDIR /usr/share/nginx/html
-COPY --from=publish /app/publish/wwwroot .
-COPY nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-```
+3. **Compilation du Projet** :
+   ```bash
+   # Compiler en mode Debug
+   dotnet build
 
-2. Créez un fichier `nginx.conf` pour configurer le serveur web :
+   # OU compiler en mode Release
+   dotnet build -c Release
+   ```
 
-```
-events { }
-http {
-    include mime.types;
-    types {
-        application/wasm wasm;
-    }
+### Lancement de l'Application
 
-    server {
-        listen 80;
-        
-        location / {
-            root /usr/share/nginx/html;
-            try_files $uri $uri/ /index.html =404;
-        }
-    }
-}
-```
+1. **Mode Développement** :
+   ```bash
+   # Lancer directement depuis la racine du projet
+   dotnet run --project connecto.crossplat.Desktop
+   ```
 
-3. Construisez et exécutez l'image Docker :
+2. **Mode Release** :
+   ```bash
+   # Compiler en Release
+   dotnet publish connecto.crossplat.Desktop -c Release
 
+   # Accéder au dossier de publication
+   cd connecto.crossplat.Desktop/bin/Release/net9.0/publish
+
+   # Lancer l'application
+   ./connecto.crossplat.Desktop
+   ```
+
+### Vérification de l'Installation Desktop
+
+1. **Vérifications Initiales** :
+   - L'application se lance sans erreurs
+   - La fenêtre principale s'affiche correctement
+   - Les polices et icônes sont visibles
+
+2. **Test des Fonctionnalités** :
+   - Connexion avec les identifiants par défaut :
+     - Utilisateur : admin
+     - Mot de passe : password
+   - Navigation dans les différentes sections
+   - Test de l'envoi/réception de messages
+
+3. **Vérification des Performances** :
+   - L'application répond rapidement
+   - Les animations sont fluides
+   - La mémoire utilisée est raisonnable
+
+### Résolution des Problèmes Desktop Courants
+
+1. **Erreur de SDK manquant** :
+   ```bash
+   # Vérifier la version du SDK
+   dotnet --info
+
+   # Réinstaller le SDK si nécessaire
+   # Télécharger depuis https://dotnet.microsoft.com/download/dotnet/9.0
+   ```
+
+2. **Problèmes de Compilation** :
+   ```bash
+   # Nettoyage complet
+   dotnet clean
+   # Supprimer les dossiers bin et obj
+   rm -rf */bin */obj
+   # Restaurer et reconstruire
+   dotnet restore
+   dotnet build
+   ```
+
+3. **Erreurs de Dépendances** :
+   ```bash
+   # Vérifier les packages NuGet
+   dotnet list package
+   # Mettre à jour tous les packages
+   dotnet add package Microsoft.NET.Sdk.WebAssembly --version 9.0.0
+   ```
+
+### Configuration Recommandée
+
+- **Matériel Minimal** :
+  - Processeur : Double cœur 2 GHz
+  - RAM : 4 GB minimum
+  - Espace disque : 1 GB libre
+  - Carte graphique : Compatible DirectX 10 ou OpenGL 3.3
+
+- **Configuration Optimale** :
+  - Processeur : Quad core 2.5 GHz
+  - RAM : 8 GB ou plus
+  - SSD avec 2 GB d'espace libre
+  - Carte graphique dédiée avec 2 GB VRAM
+
+## 🔍 Vérification de l'Installation
+
+### Pour la Version Web
+1. Ouvrez http://localhost:8080 dans votre navigateur
+2. Vérifiez que la page d'accueil s'affiche
+3. Testez la connexion avec les identifiants par défaut
+
+### Pour la Version Desktop
+1. Vérifiez que l'application se lance
+2. La fenêtre principale devrait s'afficher
+3. Testez la connexion avec les identifiants par défaut
+
+## 🛠️ Résolution des Problèmes Courants
+
+### Erreur de Port Déjà Utilisé
 ```bash
-# Construire l'image
-docker build -t connecto:latest .
+# Trouver le processus utilisant le port 8080
+netstat -ano | findstr :8080
 
-# Exécuter le conteneur
-docker run -d -p 8080:80 connecto:latest
-```
-
-4. Accédez à l'application à l'adresse http://localhost:8080
-
-## Résolution des problèmes courants
-
-### Port déjà utilisé
-
-Si vous rencontrez l'erreur "Failed to bind to address ... address already in use", exécutez :
-
-```bash
-# Trouver le processus qui utilise le port (ex: 7169)
-netstat -ano | findstr :7169
-
-# Tuer le processus (remplacez XXXX par le PID trouvé)
+# Arrêter le processus (remplacer XXXX par le PID)
 taskkill /PID XXXX /F
 ```
 
-### Problèmes de compilation
+### Problèmes de Build Docker
+```bash
+# Nettoyer les conteneurs et images
+docker compose down
+docker system prune -a
 
-Si vous rencontrez des erreurs de compilation :
+# Reconstruire
+docker compose build --no-cache
+```
 
-1. Nettoyez la solution : `dotnet clean`
-2. Supprimez les dossiers bin et obj
-3. Restaurez les dépendances : `dotnet restore`
-4. Recompilez : `dotnet build`
+### Erreurs de Compilation .NET
+```bash
+# Nettoyage complet
+dotnet clean
+rm -rf */bin */obj
 
-## Ressources supplémentaires
+# Reconstruction
+dotnet restore
+dotnet build
+```
 
+## 📝 Notes Importantes
+
+- L'application utilise le port 8080 pour la version web
+- Docker Desktop doit être en cours d'exécution pour la version web
+- Les modifications du code nécessitent une reconstruction de l'image Docker
+
+## 🔐 Identifiants par Défaut
+
+- **Nom d'utilisateur** : admin
+- **Mot de passe** : password
+
+## 📚 Structure du Projet
+
+```
+connecto/
+├── connecto.crossplat/           # Projet principal
+│   ├── Models/                  # Modèles de données
+│   ├── Views/                   # Vues XAML
+│   ├── ViewModels/             # ViewModels
+│   └── Converters/             # Convertisseurs
+├── connecto.crossplat.Desktop/  # Version Desktop
+├── connecto.crossplat.Browser/  # Version Web
+├── Dockerfile.web              # Configuration Docker
+└── docker-compose.yml          # Configuration Docker Compose
+```
+
+## 🤝 Support
+
+Si vous rencontrez des problèmes :
+1. Vérifiez les logs Docker : `docker compose logs`
+2. Vérifiez l'état des conteneurs : `docker compose ps`
+3. Consultez les issues GitHub
+4. Ouvrez une nouvelle issue si nécessaire
+
+## 🔄 Mise à Jour du Projet
+
+Pour mettre à jour votre copie locale :
+
+```bash
+git pull origin main
+docker compose build --no-cache  # Si vous utilisez Docker
+```
+
+## 🔗 Liens Utiles
 - [Documentation Avalonia](https://docs.avaloniaui.net/)
-- [Documentation CommunityToolkit.Mvvm](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
-- [Documentation .NET 9](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-9)
+- [Documentation .NET](https://docs.microsoft.com/fr-fr/dotnet/)
+- [Documentation Docker](https://docs.docker.com/)
 
-Ce guide devrait permettre à n'importe quel développeur de configurer, exécuter et travailler sur le projet Connecto.
+## 👨‍💻 Guide du Développeur
+
+### Workflow de Développement Desktop
+
+1. **Après Modification du Code** :
+   ```bash
+   # Arrêter l'application si elle est en cours d'exécution
+   # Nettoyer la solution
+   dotnet clean
+
+   # Restaurer les packages
+   dotnet restore
+
+   # Compiler
+   dotnet build
+
+   # Lancer l'application desktop
+   dotnet run --project connecto.crossplat.Desktop
+   ```
+
+2. **En Cas d'Erreurs de Compilation** :
+   ```bash
+   # Supprimer les dossiers bin et obj
+   rm -rf */bin */obj
+
+   # Nettoyer le cache NuGet local
+   dotnet nuget locals all --clear
+
+   # Réinstaller les packages et rebuilder
+   dotnet restore
+   dotnet build
+   ```
+
+3. **Pour le Hot Reload** :
+   ```bash
+   # Lancer avec le hot reload activé
+   dotnet watch run --project connecto.crossplat.Desktop
+   ```
+
+## 🌐 Déploiement Web Sans Docker
+
+### 1. Prérequis Web
+- .NET SDK 9.0 ou supérieur
+- Un navigateur moderne (Chrome, Firefox, Edge)
+- Node.js (pour certaines dépendances web)
+
+### 2. Configuration Web
+```bash
+# Installer les outils WebAssembly
+dotnet workload install wasm-tools
+
+# Vérifier l'installation
+dotnet workload list
+```
+
+### 3. Compilation et Exécution Web
+```bash
+# Compiler en mode Release
+dotnet publish connecto.crossplat.Browser -c Release
+
+# Lancer le serveur de développement
+dotnet run --project connecto.crossplat.Browser
+
+# OU pour le développement avec hot reload
+dotnet watch run --project connecto.crossplat.Browser
+```
+
+### 4. Accès à l'Application Web
+- Ouvrir http://localhost:5000 dans votre navigateur
+- Pour un accès externe : http://[votre-ip]:5000
+
+## 📱 Déploiement Mobile
+
+### 1. Prérequis Android
+- Android Studio installé
+- SDK Android (API 33 minimum)
+- JDK 17 ou supérieur
+- Variables d'environnement configurées :
+  ```bash
+  JAVA_HOME=chemin/vers/jdk
+  ANDROID_HOME=chemin/vers/android/sdk
+  ```
+
+### 2. Configuration Android
+1. **Activer le Mode Développeur sur l'appareil** :
+   - Paramètres → À propos du téléphone
+   - Appuyer 7 fois sur "Numéro de build"
+   - Retour aux paramètres → Options pour les développeurs
+   - Activer "Débogage USB"
+
+2. **Configurer ADB** :
+   ```bash
+   # Vérifier les appareils connectés
+   adb devices
+
+   # Si aucun appareil n'est listé :
+   adb kill-server
+   adb start-server
+   ```
+
+### 3. Compilation et Déploiement Android
+```bash
+# Installer les workloads nécessaires
+dotnet workload install android ios maui-android
+
+# Compiler pour Android
+dotnet build -f net9.0-android
+
+# Déployer sur l'appareil
+dotnet build -f net9.0-android -t:Install
+
+# Lancer l'application
+dotnet build -f net9.0-android -t:Run
+```
+
+### 4. Débogage Android
+```bash
+# Voir les logs en temps réel
+adb logcat -s "connecto"
+
+# Nettoyer les données de l'application
+adb shell pm clear com.companyname.connecto.crossplat
+```
+
+### 5. Configuration iOS (macOS uniquement)
+1. **Prérequis** :
+   - Mac avec macOS Ventura ou plus récent
+   - Xcode 15 ou plus récent
+   - Compte développeur Apple
+
+2. **Installation** :
+   ```bash
+   # Installer les outils iOS
+   dotnet workload install ios maui-ios
+
+   # Vérifier l'installation
+   dotnet workload list
+   ```
+
+3. **Compilation et Déploiement iOS** :
+   ```bash
+   # Compiler pour iOS
+   dotnet build -f net9.0-ios
+
+   # Déployer sur le simulateur
+   dotnet build -f net9.0-ios -t:Run
+   ```
+
+## 🔍 Vérification des Déploiements
+
+### Desktop
+- L'application se lance correctement
+- Les animations sont fluides
+- La barre latérale se redimensionne
+- Les messages s'envoient correctement
+
+### Web
+- Le chargement initial est rapide
+- Les WebAssembly sont chargés correctement
+- La réactivité est bonne
+- Les websockets fonctionnent
+
+### Mobile
+- L'application s'adapte à la taille de l'écran
+- Le clavier virtuel ne cache pas le champ de texte
+- Les animations sont fluides
+- La consommation de ressources est raisonnable
+
+## ⚠️ Résolution des Problèmes Courants
+
+### Problèmes de Build
+```bash
+# Erreur de SDK
+dotnet --info
+dotnet new --install Microsoft.DotNet.Web.ProjectTemplates.9.0
+
+# Erreur de packages
+dotnet nuget locals all --clear
+dotnet restore --force
+```
+
+### Problèmes Android
+```bash
+# Erreur de SDK Android
+$ANDROID_HOME/tools/bin/sdkmanager --update
+$ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-33"
+
+# Erreur d'émulateur
+$ANDROID_HOME/tools/bin/avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64"
+```
+
+### Problèmes iOS
+```bash
+# Erreur de certificats
+security unlock-keychain
+xcode-select --install
+
+# Erreur de provisioning
+xcrun simctl list
+```

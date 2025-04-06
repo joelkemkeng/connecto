@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Interactivity;
 using System;
 using Avalonia.Platform;
+using connecto.crossplat.ViewModels;
 
 namespace connecto.crossplat.Views
 {
@@ -14,6 +15,7 @@ namespace connecto.crossplat.Views
         private Border? _messageInputArea;
         private TextBox? _messageTextBox;
         private bool _isMobilePlatform;
+        private HomeViewModel? _viewModel;
 
         public HomeView()
         {
@@ -27,8 +29,20 @@ namespace connecto.crossplat.Views
 
             if (_messageTextBox != null)
             {
-                _messageTextBox.GotFocus += OnMessageTextBoxGotFocus;
-                _messageTextBox.LostFocus += OnMessageTextBoxLostFocus;
+                _messageTextBox.GotFocus += MessageTextBox_GotFocus;
+                _messageTextBox.LostFocus += MessageTextBox_LostFocus;
+            }
+
+            _viewModel = DataContext as HomeViewModel;
+        }
+
+        protected override void OnLoaded(RoutedEventArgs e)
+        {
+            base.OnLoaded(e);
+            if (_viewModel != null)
+            {
+                _viewModel.CheckScreenSize(this);
+                _viewModel.SetMessageInputArea(MessageInputArea);
             }
         }
 
@@ -38,19 +52,19 @@ namespace connecto.crossplat.Views
             return os;
         }
 
-        private void OnMessageTextBoxGotFocus(object? sender, GotFocusEventArgs e)
+        private void MessageTextBox_GotFocus(object? sender, GotFocusEventArgs e)
         {
-            if (_messageInputArea != null && _isMobilePlatform)
+            if (_viewModel != null)
             {
-                _messageInputArea.Margin = new Thickness(0, 0, 0, 300);
+                _viewModel.OnKeyboardVisible();
             }
         }
 
-        private void OnMessageTextBoxLostFocus(object? sender, RoutedEventArgs e)
+        private void MessageTextBox_LostFocus(object? sender, RoutedEventArgs e)
         {
-            if (_messageInputArea != null && _isMobilePlatform)
+            if (_viewModel != null)
             {
-                _messageInputArea.Margin = new Thickness(0);
+                _viewModel.OnKeyboardHidden();
             }
         }
 

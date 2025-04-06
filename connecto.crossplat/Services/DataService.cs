@@ -51,7 +51,7 @@ namespace connecto.crossplat.Services
                     Id = 1, 
                     ChannelId = 1, 
                     Username = "System", 
-                    Content = "Bienvenue sur Connecto!", 
+                    Content = "Bienvenue sur Connecto! Joel au controle ! et toi?", 
                     Timestamp = "Aujourd'hui à 10:00", 
                     AvatarUrl = "/Assets/logo.png" 
                 },

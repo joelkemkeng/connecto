@@ -313,6 +313,73 @@ git pull origin main
 docker compose build --no-cache  # Si vous utilisez Docker
 ```
 
+## 🔄 Mise à Jour du Code et Rebuild
+
+### Après Modification du Code
+
+1. **Méthode Complète** (recommandée pour les changements majeurs) :
+```bash
+# Arrêter les conteneurs
+docker compose down
+
+# Nettoyer le cache de build
+docker compose build --no-cache
+
+# Redémarrer les conteneurs
+docker compose up -d
+
+# Vérifier les logs pour s'assurer que tout fonctionne
+docker compose logs -f
+```
+
+2. **Méthode Rapide** (pour les petits changements) :
+```bash
+# Rebuild et redémarrage en une commande
+docker compose up -d --build
+```
+
+### Vérification des Modifications
+
+1. **Vérifier le statut des conteneurs** :
+```bash
+# Liste des conteneurs en cours d'exécution
+docker compose ps
+
+# Voir les logs en temps réel
+docker compose logs -f
+```
+
+2. **En cas de problèmes** :
+```bash
+# Voir les logs détaillés du build
+docker compose build --no-cache --progress=plain
+
+# Nettoyer complètement Docker si nécessaire
+docker system prune -a
+docker volume prune
+```
+
+### Bonnes Pratiques de Rebuild
+
+1. **Avant le Rebuild** :
+   - Sauvegarder les modifications
+   - Commiter les changements dans Git
+   - Vérifier l'espace disque disponible
+
+2. **Pendant le Rebuild** :
+   - Surveiller les logs pour détecter les erreurs
+   - Vérifier que tous les services démarrent correctement
+
+3. **Après le Rebuild** :
+   - Tester l'application dans le navigateur
+   - Vérifier que les nouvelles fonctionnalités marchent
+   - Contrôler l'utilisation des ressources
+
+4. **Optimisations** :
+   - Utiliser le cache Docker quand possible
+   - Nettoyer régulièrement les images non utilisées
+   - Maintenir une documentation des changements
+
 ## 🔗 Liens Utiles
 - [Documentation Avalonia](https://docs.avaloniaui.net/)
 - [Documentation .NET](https://docs.microsoft.com/fr-fr/dotnet/)

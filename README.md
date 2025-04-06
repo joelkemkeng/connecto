@@ -502,3 +502,129 @@ xcode-select --install
 # Erreur de provisioning
 xcrun simctl list
 ```
+
+## 🐧 Déploiement sur Linux/Ubuntu
+
+### 1. Prérequis Linux
+```bash
+# Mettre à jour le système
+sudo apt update && sudo apt upgrade -y
+
+# Installer Docker
+sudo apt install -y docker.io docker-compose
+
+# Démarrer et activer Docker
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Ajouter l'utilisateur au groupe docker
+sudo usermod -aG docker $USER
+# Se déconnecter et se reconnecter pour appliquer les changements
+```
+
+### 2. Cloner et Préparer le Projet
+```bash
+# Cloner le projet
+git clone https://github.com/joelkemkeng/connecto.git
+cd connecto/connecto/connecto.crossplat
+
+# Donner les permissions d'exécution
+chmod +x Dockerfile.web
+chmod +x nginx.conf
+```
+
+### 3. Configuration des Ports
+```bash
+# Vérifier si le port 8080 est libre
+sudo lsof -i :8080
+
+# Si le port est utilisé, le libérer
+sudo kill -9 $(sudo lsof -t -i:8080)
+```
+
+### 4. Build et Démarrage
+```bash
+# Construire l'image
+docker compose build --no-cache
+
+# Démarrer les conteneurs
+docker compose up -d
+
+# Vérifier les logs
+docker compose logs -f
+```
+
+### 5. Vérification du Déploiement
+- Ouvrir http://localhost:8080 dans votre navigateur
+- Pour un accès externe : http://[votre-ip]:8080
+- Vérifier les logs : `docker compose logs -f connecto-web`
+
+### 6. Résolution des Problèmes Linux Courants
+
+#### Problèmes de Permissions
+```bash
+# Si erreur de permissions Docker
+sudo chmod 666 /var/run/docker.sock
+
+# Si erreur d'accès aux fichiers
+sudo chown -R $USER:$USER .
+```
+
+#### Problèmes de Ports
+```bash
+# Vérifier les ports utilisés
+sudo netstat -tulpn | grep LISTEN
+
+# Configurer le pare-feu
+sudo ufw allow 8080/tcp
+```
+
+#### Problèmes de Build
+```bash
+# Nettoyer Docker
+docker system prune -a
+
+# Reconstruire sans cache
+docker compose build --no-cache
+```
+
+#### Problèmes de Certificats
+```bash
+# Si problème de certificats SSL
+sudo update-ca-certificates
+
+# Si problème avec les certificats Docker
+sudo mkdir -p /etc/docker/certs.d/docker.io
+sudo cp /etc/ssl/certs/ca-certificates.crt /etc/docker/certs.d/docker.io/
+```
+
+### 7. Commandes Utiles pour la Maintenance
+```bash
+# Arrêter l'application
+docker compose down
+
+# Voir l'utilisation des ressources
+docker stats
+
+# Nettoyer les images non utilisées
+docker image prune -a
+
+# Sauvegarder les logs
+docker compose logs > connecto_logs.txt
+```
+
+### 8. Notes Importantes pour Linux
+1. **Performance** :
+   - L'application utilise nginx:alpine pour une empreinte minimale
+   - La compilation se fait dans un conteneur séparé
+   - Les ressources sont optimisées pour Linux
+
+2. **Sécurité** :
+   - Les ports exposés sont minimaux (uniquement 8080)
+   - Les conteneurs s'exécutent en mode non-root
+   - Les images sont basées sur des versions officielles
+
+3. **Maintenance** :
+   - Les logs sont accessibles via docker compose
+   - Le healthcheck vérifie l'état toutes les 30 secondes
+   - Le redémarrage automatique est configuré

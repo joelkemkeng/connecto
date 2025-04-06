@@ -1,5 +1,9 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq; // Ajout de cette directive pour les méthodes LINQ
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -7,6 +11,9 @@ namespace connecto.crossplat.ViewModels
 {
     public partial class HomeViewModel : ViewModelBase
     {
+        private const double COLLAPSE_WIDTH_THRESHOLD = 1000; // Largeur en pixels en dessous de laquelle la barre se réduit
+        private Window? _window;
+
         [ObservableProperty]
         private string _currentUser = "Admin";
 
@@ -27,6 +34,43 @@ namespace connecto.crossplat.ViewModels
 
         [ObservableProperty]
         private ChannelModel? _selectedChannel; // Rendre nullable
+
+        [ObservableProperty]
+        private bool _isSidebarExpanded = false;
+
+        public void CheckScreenSize(Control control)
+        {
+            if (control != null)
+            {
+                var window = control.GetVisualRoot() as Window;
+                if (window != null)
+                {
+                    _window = window;
+                    UpdateSidebarState();
+                    _window.PropertyChanged += (s, e) =>
+                    {
+                        if (e.Property == Window.BoundsProperty)
+                        {
+                            UpdateSidebarState();
+                        }
+                    };
+                }
+            }
+        }
+
+        private void UpdateSidebarState()
+        {
+            if (_window != null)
+            {
+                IsSidebarExpanded = _window.Bounds.Width > COLLAPSE_WIDTH_THRESHOLD;
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleSidebar()
+        {
+            IsSidebarExpanded = !IsSidebarExpanded;
+        }
 
         public HomeViewModel()
         {

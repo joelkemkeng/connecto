@@ -19,8 +19,21 @@ namespace connecto.crossplat.ViewModels
         [ObservableProperty]
         private bool _isLoading = false;
 
+        [ObservableProperty]
+        private bool _showPassword = false;
+
+        [ObservableProperty]
+        private string _passwordChar = "•";
+
         // Propriété pour la navigation
-        public event EventHandler<NavigationEventArgs>? NavigationRequested; // Rendre nullable
+        public event EventHandler<NavigationEventArgs>? NavigationRequested;
+
+        [RelayCommand]
+        private void TogglePasswordVisibility()
+        {
+            ShowPassword = !ShowPassword;
+            PasswordChar = ShowPassword ? "" : "•";
+        }
 
         [RelayCommand]
         private async Task Login()

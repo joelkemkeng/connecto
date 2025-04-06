@@ -1,0 +1,20 @@
+# --- Étape de build pour la version Desktop ---
+    FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+    WORKDIR /app
+    
+    # Copier l'ensemble du code source
+    COPY . .
+    
+    # Publier l'application Desktop en mode Release
+    RUN dotnet publish connecto.crossplat.Desktop/connecto.crossplat.Desktop.csproj -c Release -o /app/publish
+    
+    # --- Étape finale : Préparer l'image pour l'exécution graphique ---
+    FROM mcr.microsoft.com/dotnet/runtime:9.0 AS runtime
+    WORKDIR /app
+    COPY --from=build /app/publish .
+    
+    # Pour utiliser l'affichage graphique (X11) sous Linux
+    ENV DISPLAY=:0
+    
+    ENTRYPOINT ["dotnet", "connecto.crossplat.Desktop.dll"]
+    

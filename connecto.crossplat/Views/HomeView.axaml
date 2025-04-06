@@ -3,6 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:connecto.crossplat.ViewModels"
+             xmlns:converters="clr-namespace:connecto.crossplat.Converters"
+             xmlns:behaviors="using:connecto.crossplat.Behaviors"
+             xmlns:sys="using:System"
              mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
              x:Class="connecto.crossplat.Views.HomeView"
              x:DataType="vm:HomeViewModel">
@@ -11,7 +14,7 @@
     <vm:HomeViewModel />
   </Design.DataContext>
 
-  <Grid ColumnDefinitions="70,220,*" RowDefinitions="*">
+  <Grid ColumnDefinitions="70,Auto,*" RowDefinitions="*">
     <!-- Barre latérale des serveurs -->
     <Border Grid.Column="0" Background="#202225">
       <StackPanel Spacing="8" Margin="0,15,0,0">
@@ -41,28 +44,66 @@
     </Border>
     
     <!-- Liste des canaux -->
-    <Border Grid.Column="1" Background="#2f3136">
+    <Border Grid.Column="1" Background="#2f3136" MinWidth="70">
       <Grid RowDefinitions="Auto,*,Auto">
         <!-- En-tête du serveur -->
         <Border Grid.Row="0" Background="#2f3136" Height="50" BorderThickness="0,0,0,1" BorderBrush="#232428">
-          <TextBlock Text="{Binding SelectedServer.Name}" Margin="15,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Foreground="White"/>
+          <Grid ColumnDefinitions="*,Auto">
+            <Grid Grid.Column="0" IsVisible="{Binding IsSidebarExpanded}">
+              <TextBlock Text="{Binding SelectedServer.Name}" 
+                       Margin="15,0,0,0" 
+                       VerticalAlignment="Center" 
+                       FontWeight="Bold" 
+                       Foreground="White"/>
+            </Grid>
+            <Button Grid.Column="1" 
+                    Command="{Binding ToggleSidebarCommand}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="15"
+                    Margin="0,0,5,0"
+                    VerticalAlignment="Center">
+              <TextBlock Text="{Binding IsSidebarExpanded, Converter={StaticResource BoolToArrowConverter}}"
+                       FontSize="14"
+                       Foreground="White"/>
+            </Button>
+          </Grid>
         </Border>
         
         <!-- Liste des canaux -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-          <ItemsControl ItemsSource="{Binding Channels}" Margin="10">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Height="35" Margin="0,2" CornerRadius="4" Padding="10,0" Background="#36393f">
-                  <Grid ColumnDefinitions="Auto,*">
-                    <TextBlock Grid.Column="0" Text="{Binding Icon}" Foreground="#8e9297" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#dcddde" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </ScrollViewer>
+        <Grid Grid.Row="1">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Channels}" Margin="10">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Height="35" Margin="0,2" CornerRadius="4" Padding="10,0" Background="#36393f">
+                    <Grid>
+                      <!-- Version étendue -->
+                      <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding $parent[UserControl].((vm:HomeViewModel)DataContext).IsSidebarExpanded}">
+                        <TextBlock Grid.Column="0" Text="{Binding Icon}" Foreground="#8e9297" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#dcddde" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                      </Grid>
+                      
+                      <!-- Version réduite -->
+                      <Border Width="35" Height="35" 
+                              CornerRadius="4" 
+                              Background="#2f3136"
+                              HorizontalAlignment="Center"
+                              IsVisible="{Binding !$parent[UserControl].((vm:HomeViewModel)DataContext).IsSidebarExpanded}">
+                        <TextBlock Text="{Binding Name, Converter={StaticResource NameToInitialsConverter}}"
+                                 Foreground="#dcddde"
+                                 FontSize="14"
+                                 FontWeight="SemiBold"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+                      </Border>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
         
         <!-- Barre utilisateur -->
         <Border Grid.Row="2" Background="#292b2f" Height="50">
@@ -70,7 +111,7 @@
             <Border Grid.Column="0" Width="30" Height="30" CornerRadius="15" Background="#4A7EFF">
               <TextBlock Text="A" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
             </Border>
-            <TextBlock Grid.Column="1" Text="{Binding CurrentUser}" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="White"/>
+            <TextBlock Grid.Column="1" Text="{Binding CurrentUser}" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="White" IsVisible="{Binding IsSidebarExpanded}"/>
             <Button Grid.Column="2" Content="⚙️" Background="Transparent" BorderThickness="0" Padding="5" Foreground="White"/>
           </Grid>
         </Border>
@@ -116,11 +157,50 @@
         <!-- Zone de saisie du message -->
         <Border Grid.Row="2" Background="#36393f" Padding="20" BorderThickness="0,1,0,0" BorderBrush="#232428">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBox Grid.Column="0" Text="{Binding MessageText}" Watermark="Envoyer un message à #général" CornerRadius="5" Padding="10" Background="#40393f" Foreground="White" BorderThickness="0"/>
+            <TextBox Grid.Column="0" 
+                    Text="{Binding MessageText}" 
+                    Watermark="Envoyer un message à #général" 
+                    CornerRadius="5" 
+                    Padding="10" 
+                    Background="#40393f" 
+                    Foreground="White"
+                    CaretBrush="White"
+                    BorderThickness="0">
+              <TextBox.Styles>
+                <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+                  <Setter Property="Background" Value="#40393f"/>
+                </Style>
+                <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+                  <Setter Property="Background" Value="#40393f"/>
+                </Style>
+              </TextBox.Styles>
+            </TextBox>
             <Button Grid.Column="1" Content="Envoyer" Command="{Binding SendMessageCommand}" Margin="10,0,0,0" Background="#4A7EFF" Foreground="White" CornerRadius="5" Padding="15,10"/>
           </Grid>
         </Border>
       </Grid>
     </Border>
   </Grid>
+
+  <UserControl.Resources>
+    <converters:BoolToWidthConverter x:Key="BoolToWidthConverter"/>
+    <converters:BoolToArrowConverter x:Key="BoolToArrowConverter"/>
+    <converters:NameToInitialsConverter x:Key="NameToInitialsConverter"/>
+    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="Border.channels-sidebar">
+      <Style.Animations>
+        <Animation Duration="0:0:0.2">
+          <KeyFrame Cue="0%">
+            <Setter Property="Width" Value="220"/>
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Width" Value="70"/>
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+  </UserControl.Styles>
 </UserControl>
